@@ -23,5 +23,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "android-base-template"
+rootProject.name = "qron"
 include(":app")
