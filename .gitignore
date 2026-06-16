@@ -214,3 +214,5 @@ fabric.properties
 /build
 /captures
 .cxx
+
+AGENTS.md
