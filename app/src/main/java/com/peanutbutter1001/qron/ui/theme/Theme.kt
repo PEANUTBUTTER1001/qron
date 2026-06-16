@@ -1,4 +1,4 @@
-package com.peanutbutter1001.android_base_template.ui.theme
+package com.peanutbutter1001.qron.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -34,7 +34,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun AndroidbasetemplateTheme(
+fun QRonTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

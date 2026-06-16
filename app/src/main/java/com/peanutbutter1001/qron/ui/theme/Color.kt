@@ -1,4 +1,4 @@
-package com.peanutbutter1001.android_base_template.ui.theme
+package com.peanutbutter1001.qron.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
