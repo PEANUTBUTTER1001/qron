@@ -5,10 +5,10 @@ plugins {
 }
 
 android {
-    namespace = "com.peanutbutter1001.android_base_template"
+    namespace = "com.peanutbutter1001.qron"
 
     defaultConfig {
-        applicationId = "com.peanutbutter1001.android_base_template"
+        applicationId = "com.peanutbutter1001.qron"
         versionCode = 1
         versionName = "1.0"
     }
