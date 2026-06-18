@@ -25,3 +25,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "qron"
 include(":app")
+include(":domain")
+include(":data")

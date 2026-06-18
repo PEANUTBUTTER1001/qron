@@ -22,4 +22,20 @@ dependencies {
 
     implementation(libs.bundles.compose.core)
     debugImplementation(libs.bundles.compose.debug)
+
+    // Modules
+    implementation(project(":domain"))
+    implementation(project(":data"))
+
+    // CameraX
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+
+    // Hilt Navigation Compose
+    implementation(libs.hilt.navigation.compose)
+
+    // ML Kit (for InputImage)
+    implementation(libs.mlkit.barcode.scanning)
 }
