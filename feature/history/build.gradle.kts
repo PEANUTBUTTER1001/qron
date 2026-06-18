@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":domain"))
 
-    implementation(project(":data")) // Often needed in feature for previews/fakes or specific mappings, though strictly ViewModel needs domain.
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.bundles.compose.core)

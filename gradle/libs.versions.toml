@@ -95,6 +95,7 @@ mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version
 # Coroutines
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutines" }
 
 [bundles]
 # 안드로이드 기본 UI 및 Core
