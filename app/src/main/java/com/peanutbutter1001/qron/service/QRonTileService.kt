@@ -15,6 +15,7 @@ class QRonTileService : TileService() {
         qsTile?.updateTile()
     }
 
+    @android.annotation.SuppressLint("StartActivityAndCollapseDeprecated")
     override fun onClick() {
         super.onClick()
         
