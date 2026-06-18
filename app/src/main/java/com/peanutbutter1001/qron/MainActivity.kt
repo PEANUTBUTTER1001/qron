@@ -13,9 +13,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import com.peanutbutter1001.qron.ui.history.HistoryScreen
-import com.peanutbutter1001.qron.ui.scanner.ScannerScreen
-import com.peanutbutter1001.qron.ui.theme.QRonTheme
+import com.peanutbutter1001.qron.feature.history.HistoryScreen
+import com.peanutbutter1001.qron.feature.scanner.ScannerScreen
+import com.peanutbutter1001.qron.core.designsystem.theme.QRonTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -61,7 +61,7 @@ fun MainScreen() {
                     onInternalScanSelected = { /* 접근성 서비스 등 안내 */ }
                 )
                 1 -> {
-                    val historyViewModel: com.peanutbutter1001.qron.ui.history.HistoryViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+                    val historyViewModel: com.peanutbutter1001.qron.feature.history.HistoryViewModel = androidx.hilt.navigation.compose.hiltViewModel()
                     val historyList by historyViewModel.historyList.collectAsState()
                     HistoryScreen(
                         historyList = historyList,

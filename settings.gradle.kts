@@ -27,3 +27,11 @@ rootProject.name = "qron"
 include(":app")
 include(":domain")
 include(":data")
+include(":feature:history")
+include(":feature:result")
+include(":feature:scanner")
+
+include(":core:designsystem")
+include(":core:database")
+include(":core:vision")
+include(":feature:scan")

@@ -1,0 +1,3 @@
+-keep,allowoptimization,allowobfuscation class * {
+    *;
+}

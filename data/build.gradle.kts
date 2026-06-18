@@ -10,6 +10,7 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":core:database"))
     
     // Room
     implementation(libs.room.runtime)
