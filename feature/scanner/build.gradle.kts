@@ -13,7 +13,6 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":domain"))
 
-    implementation(project(":data"))
     implementation(project(":feature:result")) // For navigation to ScanResultActivity
     
     implementation(libs.androidx.core.ktx)
