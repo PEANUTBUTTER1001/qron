@@ -1,0 +1,33 @@
+plugins {
+    id("my.android.library")
+    id("my.android.compose")
+    id("my.android.hilt")
+}
+
+android {
+    namespace = "com.peanutbutter1001.qron.feature.scanner"
+}
+
+dependencies {
+    implementation(project(":core:vision"))
+    implementation(project(":core:designsystem"))
+    implementation(project(":domain"))
+
+    implementation(project(":data"))
+    implementation(project(":feature:result")) // For navigation to ScanResultActivity
+    
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.bundles.compose.core)
+    implementation(libs.hilt.navigation.compose)
+    debugImplementation(libs.bundles.compose.debug)
+
+    // CameraX
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+
+    // ML Kit
+    implementation(libs.mlkit.barcode.scanning)
+}

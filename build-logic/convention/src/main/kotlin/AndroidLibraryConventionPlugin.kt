@@ -17,7 +17,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 defaultConfig {
                     minSdk = 26
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-                    consumerProguardFiles("consumer-rules.pro") // 👈 Proguard 규칙 추가
+                    consumerProguardFiles("consumer-rules.pro") // ?�� Proguard 규칙 추�?
                 }
 
                 buildTypes {

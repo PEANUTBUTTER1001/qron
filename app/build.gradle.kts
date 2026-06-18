@@ -26,6 +26,11 @@ dependencies {
     // Modules
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":feature:history"))
+    implementation(project(":feature:scanner"))
+    implementation(project(":feature:result"))
+    implementation(project(":feature:scan"))
+    implementation(project(":core:designsystem"))
 
     // CameraX
     implementation(libs.camerax.core)
