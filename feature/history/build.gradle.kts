@@ -1,7 +1,5 @@
 plugins {
-    id("my.android.library")
-    id("my.android.compose")
-    id("my.android.hilt")
+    id("my.android.feature")
 }
 
 android {
@@ -11,10 +9,4 @@ android {
 dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":domain"))
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.bundles.compose.core)
-    implementation(libs.hilt.navigation.compose)
-    debugImplementation(libs.bundles.compose.debug)
 }

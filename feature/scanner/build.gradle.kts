@@ -1,7 +1,5 @@
 plugins {
-    id("my.android.library")
-    id("my.android.compose")
-    id("my.android.hilt")
+    id("my.android.feature")
 }
 
 android {
@@ -14,12 +12,6 @@ dependencies {
     implementation(project(":domain"))
 
     implementation(project(":feature:result")) // For navigation to ScanResultActivity
-    
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.bundles.compose.core)
-    implementation(libs.hilt.navigation.compose)
-    debugImplementation(libs.bundles.compose.debug)
 
     // CameraX
     implementation(libs.camerax.core)
