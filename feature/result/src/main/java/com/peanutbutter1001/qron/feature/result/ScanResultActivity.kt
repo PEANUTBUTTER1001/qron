@@ -1,133 +1,35 @@
 package com.peanutbutter1001.qron.feature.result
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import com.peanutbutter1001.qron.domain.model.QRResult
-import com.peanutbutter1001.qron.domain.model.QRType
+import com.peanutbutter1001.qron.core.designsystem.theme.QRonTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * 앱 외부(OS) 진입 전용 결과 화면.
+ * 화면 내 스캔(feature:scan)의 QuickSettings 타일 → 접근성 서비스 캡처 후
+ * PendingIntent로 이 Activity를 실행하며, "QR_RESULT_ID" extra로 결과 ID를 전달한다.
+ *
+ * 인앱 스캔 전환은 이 Activity가 아니라 AppNavHost의 Result destination을 사용한다.
+ * 두 경로 모두 동일한 ResultRoute/ResultScreen 컴포저블을 재사용한다.
+ */
 @AndroidEntryPoint
 class ScanResultActivity : ComponentActivity() {
-    
-    private val viewModel: ScanResultViewModel by viewModels()
-
-    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+        val resultId = intent.getLongExtra(EXTRA_QR_RESULT_ID, -1L)
         setContent {
-            val result by viewModel.uiState.collectAsState()
-            
-            MaterialTheme {
-                ModalBottomSheet(
-                    onDismissRequest = { finish() }
-                ) {
-                    result?.let { qrData ->
-                        ResultContent(
-                            qrResult = qrData,
-                            onOpenLink = {
-                                if (qrData.type == QRType.URL) {
-                                    openUrl(qrData.rawValue)
-                                }
-                            },
-                            onCopy = {
-                                copyToClipboard(qrData.rawValue)
-                            },
-                            onShare = {
-                                shareText(qrData.rawValue)
-                            }
-                        )
-                    } ?: run {
-                        // Loading or not found state
-                        Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
-                    }
-                }
+            QRonTheme {
+                ResultRoute(
+                    resultId = resultId,
+                    onDismiss = { finish() }
+                )
             }
         }
     }
 
-    private fun openUrl(url: String) {
-        try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(this, "열 수 없는 링크입니다.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun copyToClipboard(text: String) {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("QR Code", text)
-        clipboard.setPrimaryClip(clip)
-        Toast.makeText(this, "클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun shareText(text: String) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, text)
-        }
-        startActivity(Intent.createChooser(intent, "공유하기"))
-    }
-}
-
-@Composable
-fun ResultContent(
-    qrResult: QRResult,
-    onOpenLink: () -> Unit,
-    onCopy: () -> Unit,
-    onShare: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(24.dp)
-    ) {
-        Text(qrResult.type.name, style = MaterialTheme.typography.titleSmall)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(qrResult.title, style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(qrResult.rawValue, style = MaterialTheme.typography.bodyMedium)
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            if (qrResult.type == QRType.URL) {
-                Button(onClick = onOpenLink, modifier = Modifier.weight(1f)) {
-                    Text("Open Link")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-            }
-            
-            OutlinedButton(onClick = onCopy, modifier = if (qrResult.type != QRType.URL) Modifier.weight(1f) else Modifier) {
-                Text("Copy")
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            OutlinedButton(onClick = onShare, modifier = if (qrResult.type != QRType.URL) Modifier.weight(1f) else Modifier) {
-                Text("Share")
-            }
-        }
-        Spacer(modifier = Modifier.height(32.dp))
+    companion object {
+        const val EXTRA_QR_RESULT_ID = "QR_RESULT_ID"
     }
 }

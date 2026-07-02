@@ -6,8 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
-import android.graphics.ColorSpace
-import android.hardware.HardwareBuffer
 import android.os.Build
 import android.util.Log
 import android.view.Display
@@ -18,13 +16,19 @@ import com.peanutbutter1001.qron.core.vision.QRScannerDataSource
 import com.peanutbutter1001.qron.domain.model.ScanSource
 import com.peanutbutter1001.qron.domain.repository.HistoryRepository
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class QRonAccessibilityService : AccessibilityService() {
+
+    companion object {
+        private const val TAG = "QRonAccessibility"
+    }
 
     @Inject
     lateinit var scannerDataSource: QRScannerDataSource
@@ -32,7 +36,12 @@ class QRonAccessibilityService : AccessibilityService() {
     @Inject
     lateinit var historyRepository: HistoryRepository
 
-    private val serviceScope = CoroutineScope(Dispatchers.Main)
+    // 캡처/스캔 중 예외가 나도 앱을 죽이지 않는다.
+    private val exceptionHandler = CoroutineExceptionHandler { _, e ->
+        Log.e(TAG, "코루틴 예외", e)
+    }
+    private val serviceScope =
+        CoroutineScope(Dispatchers.Main + SupervisorJob() + exceptionHandler)
 
     private var currentPendingIntent: android.app.PendingIntent? = null
 
@@ -43,7 +52,7 @@ class QRonAccessibilityService : AccessibilityService() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     performScreenshot()
                 } else {
-                    Log.e("QRon", "Screenshot requires API 30+")
+                    Log.e(TAG, "Screenshot requires API 30+")
                 }
             }
         }
@@ -57,7 +66,7 @@ class QRonAccessibilityService : AccessibilityService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(captureReceiver)
+        runCatching { unregisterReceiver(captureReceiver) }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
@@ -66,58 +75,66 @@ class QRonAccessibilityService : AccessibilityService() {
     @RequiresApi(Build.VERSION_CODES.R)
     private fun performScreenshot() {
         serviceScope.launch {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                performGlobalAction(AccessibilityService.GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
-            } else {
-                performGlobalAction(GLOBAL_ACTION_BACK)
-                kotlinx.coroutines.delay(300)
-                performGlobalAction(GLOBAL_ACTION_BACK)
-            }
-            
-            kotlinx.coroutines.delay(600)
-
-            takeScreenshot(
-                Display.DEFAULT_DISPLAY,
-                mainExecutor,
-                object : TakeScreenshotCallback {
-                    override fun onSuccess(screenshotResult: ScreenshotResult) {
-                        val hardwareBuffer = screenshotResult.hardwareBuffer
-                        val colorSpace = screenshotResult.colorSpace
-                        val bitmap = Bitmap.wrapHardwareBuffer(hardwareBuffer, colorSpace)
-                        hardwareBuffer.close()
-
-                        if (bitmap != null) {
-                            processBitmap(bitmap)
-                        }
-                    }
-
-                    override fun onFailure(errorCode: Int) {
-                        Log.e("QRon", "Screenshot failed: $errorCode")
-                        serviceScope.launch {
-                            android.widget.Toast.makeText(this@QRonAccessibilityService, "화면 캡처 실패 (코드: $errorCode). 하단바를 완전히 닫혔는지 확인해주세요.", android.widget.Toast.LENGTH_LONG).show()
-                        }
-                    }
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    performGlobalAction(AccessibilityService.GLOBAL_ACTION_DISMISS_NOTIFICATION_SHADE)
+                } else {
+                    performGlobalAction(GLOBAL_ACTION_BACK)
+                    kotlinx.coroutines.delay(300)
+                    performGlobalAction(GLOBAL_ACTION_BACK)
                 }
-            )
+
+                kotlinx.coroutines.delay(600)
+
+                takeScreenshot(
+                    Display.DEFAULT_DISPLAY,
+                    mainExecutor,
+                    object : TakeScreenshotCallback {
+                        override fun onSuccess(screenshotResult: ScreenshotResult) {
+                            try {
+                                val hardwareBuffer = screenshotResult.hardwareBuffer
+                                val colorSpace = screenshotResult.colorSpace
+                                val hwBitmap = Bitmap.wrapHardwareBuffer(hardwareBuffer, colorSpace)
+                                hardwareBuffer.close()
+
+                                if (hwBitmap != null) {
+                                    // 하드웨어 비트맵은 ML Kit에서 픽셀 접근이 불가하므로 소프트웨어 비트맵으로 복사한다.
+                                    val softwareBitmap = hwBitmap.copy(Bitmap.Config.ARGB_8888, false)
+                                    hwBitmap.recycle()
+                                    processBitmap(softwareBitmap)
+                                }
+                            } catch (e: Exception) {
+                                Log.e(TAG, "스크린샷 처리 실패", e)
+                            }
+                        }
+
+                        override fun onFailure(errorCode: Int) {
+                            Log.e(TAG, "스크린샷 실패 code=$errorCode")
+                            serviceScope.launch {
+                                android.widget.Toast.makeText(this@QRonAccessibilityService, "화면 캡처 실패 (코드: $errorCode).", android.widget.Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "performScreenshot 실패", e)
+            }
         }
     }
 
     private fun processBitmap(bitmap: Bitmap) {
         serviceScope.launch {
-            val results = scannerDataSource.scanBitmap(bitmap, ScanSource.SCREEN)
-            if (results.isNotEmpty()) {
-                val result = results.first()
-                val id = historyRepository.saveResult(result)
-                
-                try {
+            try {
+                val results = scannerDataSource.scanBitmap(bitmap, ScanSource.SCREEN)
+                if (results.isNotEmpty()) {
+                    val id = historyRepository.saveResult(results.first())
                     val fillInIntent = Intent().apply { putExtra("QR_RESULT_ID", id) }
                     currentPendingIntent?.send(this@QRonAccessibilityService, 0, fillInIntent)
-                } catch (e: Exception) {
-                    Log.e("QRon", "Failed to send pending intent", e)
+                } else {
+                    android.widget.Toast.makeText(this@QRonAccessibilityService, "화면에서 QR 코드를 찾을 수 없습니다.", android.widget.Toast.LENGTH_SHORT).show()
                 }
-            } else {
-                Log.d("QRon", "No QR found")
-                android.widget.Toast.makeText(this@QRonAccessibilityService, "화면에서 QR 코드를 찾을 수 없습니다.", android.widget.Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Log.e(TAG, "processBitmap 실패", e)
             }
         }
     }

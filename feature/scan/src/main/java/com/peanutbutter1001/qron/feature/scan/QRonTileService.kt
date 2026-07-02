@@ -2,7 +2,6 @@ package com.peanutbutter1001.qron.feature.scan
 
 import android.content.Intent
 import android.service.quicksettings.TileService
-import androidx.annotation.RequiresPermission
 
 class QRonTileService : TileService() {
     companion object {
@@ -18,7 +17,7 @@ class QRonTileService : TileService() {
     @android.annotation.SuppressLint("StartActivityAndCollapseDeprecated")
     override fun onClick() {
         super.onClick()
-        
+
         if (!isAccessibilityServiceEnabled()) {
             android.widget.Toast.makeText(this, "화면 캡처를 위해 '접근성 권한'을 켜주세요.", android.widget.Toast.LENGTH_LONG).show()
             val intent = Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
@@ -40,9 +39,9 @@ class QRonTileService : TileService() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val pendingIntent = android.app.PendingIntent.getActivity(
-            this, 
-            0, 
-            resultIntent, 
+            this,
+            0,
+            resultIntent,
             android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
         )
 
@@ -54,7 +53,6 @@ class QRonTileService : TileService() {
     }
 
     private fun isAccessibilityServiceEnabled(): Boolean {
-        val am = getSystemService(android.content.Context.ACCESSIBILITY_SERVICE) as android.view.accessibility.AccessibilityManager
         val enabledServices = android.provider.Settings.Secure.getString(
             contentResolver,
             android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
