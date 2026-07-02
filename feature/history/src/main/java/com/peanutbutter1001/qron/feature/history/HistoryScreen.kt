@@ -1,27 +1,52 @@
 package com.peanutbutter1001.qron.feature.history
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.peanutbutter1001.qron.domain.model.QRResult
+import com.peanutbutter1001.qron.domain.model.QRType
+import com.peanutbutter1001.qron.domain.model.ScanSource
+import java.time.LocalDateTime
 
+/**
+ * 기록 화면의 stateless 계층. 상태(uiState)와 이벤트 콜백만 받는다.
+ */
 @Composable
 fun HistoryScreen(
-    historyList: List<QRResult>,
-    onFilterSelected: (String) -> Unit,
+    uiState: HistoryUiState,
+    onFilterSelected: (HistoryFilter) -> Unit,
     onClearHistory: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Search bar placeholder
+            // 검색은 향후 구현 예정 (placeholder)
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
@@ -30,24 +55,27 @@ fun HistoryScreen(
             )
             Spacer(modifier = Modifier.width(8.dp))
             IconButton(onClick = onClearHistory) {
-                Text("🗑️") // 휴지통 아이콘 (임시)
+                Text("🗑️")
             }
         }
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         // Filter Chips
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(selected = true, onClick = { onFilterSelected("ALL") }, label = { Text("전체") })
-            FilterChip(selected = false, onClick = { onFilterSelected("LINK") }, label = { Text("링크") })
-            FilterChip(selected = false, onClick = { onFilterSelected("PAYMENT") }, label = { Text("결제/쿠폰") })
+            HistoryFilter.entries.forEach { filter ->
+                FilterChip(
+                    selected = uiState.selectedFilter == filter,
+                    onClick = { onFilterSelected(filter) },
+                    label = { Text(filter.label) }
+                )
+            }
         }
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
-        // List
+
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(historyList) { result ->
+            items(uiState.items) { result ->
                 HistoryItem(result)
             }
         }
@@ -55,7 +83,7 @@ fun HistoryScreen(
 }
 
 @Composable
-fun HistoryItem(result: QRResult) {
+private fun HistoryItem(result: QRResult) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.padding(16.dp)) {
             Column {
@@ -64,4 +92,26 @@ fun HistoryItem(result: QRResult) {
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun HistoryScreenPreview() {
+    HistoryScreen(
+        uiState = HistoryUiState(
+            items = listOf(
+                QRResult(
+                    id = 1,
+                    rawValue = "https://example.com",
+                    title = "예시 링크",
+                    type = QRType.URL,
+                    source = ScanSource.EXTERNAL,
+                    scannedAt = LocalDateTime.now()
+                )
+            ),
+            selectedFilter = HistoryFilter.ALL
+        ),
+        onFilterSelected = {},
+        onClearHistory = {}
+    )
 }

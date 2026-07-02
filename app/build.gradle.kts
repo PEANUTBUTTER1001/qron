@@ -2,6 +2,7 @@ plugins {
     id("my.android.application")
     id("my.android.compose")
     id("my.android.hilt")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -22,6 +23,9 @@ dependencies {
 
     implementation(libs.bundles.compose.core)
     debugImplementation(libs.bundles.compose.debug)
+
+    // Navigation (type-safe)
+    implementation(libs.androidx.navigation.compose)
 
     // Modules
     implementation(project(":domain"))

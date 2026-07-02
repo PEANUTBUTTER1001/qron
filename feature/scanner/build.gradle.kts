@@ -11,8 +11,6 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":domain"))
 
-    implementation(project(":feature:result")) // For navigation to ScanResultActivity
-
     // CameraX
     implementation(libs.camerax.core)
     implementation(libs.camerax.camera2)
