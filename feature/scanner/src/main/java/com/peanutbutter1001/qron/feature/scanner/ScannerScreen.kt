@@ -1,6 +1,8 @@
 package com.peanutbutter1001.qron.feature.scanner
 
 import android.util.Log
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -9,18 +11,13 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -31,14 +28,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview as UiPreview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.ui.tooling.preview.Preview as UiPreview
 
 /**
  * 스캐너 화면의 stateless 계층.
@@ -86,40 +82,29 @@ fun ScannerScreen(
             }
         }
 
-        // Overlay UI
         Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Spacer(modifier = Modifier.height(100.dp))
-
-            Text(
-                text = "QR 코드를 사각형 안에 맞춰주세요",
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Box(
-                modifier = Modifier
-                    .size(250.dp)
-                    .border(2.dp, Color.White, RoundedCornerShape(16.dp))
-                    .padding(16.dp)
-            )
-
-            Row(
-                modifier = Modifier
-                    .padding(bottom = 50.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
+            OutlinedButton(
+                onClick = onOpenAccessibilitySettings,
+                colors = ButtonDefaults.buttonColors(contentColor = Color.White),
+                border = BorderStroke(1.dp, Color.White),
+                modifier = Modifier.padding(20.dp)
             ) {
-                OutlinedButton(
-                    onClick = onOpenAccessibilitySettings,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                    border = BorderStroke(1.dp, Color.White)
-                ) {
-                    Text("현재 화면 스캔 안내 (접근성 권한)")
-                }
+                Text("카메라 접근성 설정")
+            }
+
+            Column(
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = "QR 코드를 보여주세요",
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(20.dp),
+                )
             }
         }
     }
@@ -158,12 +143,39 @@ private fun CameraPreview(onFrameAnalyzed: (ImageProxy) -> Unit) {
 
                 try {
                     cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
+                    val camera = cameraProvider.bindToLifecycle(
                         lifecycleOwner,
                         CameraSelector.DEFAULT_BACK_CAMERA,
                         preview,
                         imageAnalysis
                     )
+
+                    // 두 손가락 핀치 줌: 현재 zoomRatio에 제스처 배율을 곱하고
+                    // 카메라가 지원하는 min/max 범위로 clamp 한 뒤 적용한다.
+                    // (setZoomRatio 는 범위를 벗어나면 실패하므로 직접 coerceIn 한다.)
+                    val scaleGestureDetector = ScaleGestureDetector(
+                        ctx,
+                        object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                                val zoomState = camera.cameraInfo.zoomState.value
+                                val currentZoomRatio = zoomState?.zoomRatio ?: 1f
+                                val minZoomRatio = zoomState?.minZoomRatio ?: 1f
+                                val maxZoomRatio = zoomState?.maxZoomRatio ?: 1f
+                                val newZoomRatio = (currentZoomRatio * detector.scaleFactor)
+                                    .coerceIn(minZoomRatio, maxZoomRatio)
+                                camera.cameraControl.setZoomRatio(newZoomRatio)
+                                return true
+                            }
+                        }
+                    )
+
+                    previewView.setOnTouchListener { view, event ->
+                        scaleGestureDetector.onTouchEvent(event)
+                        if (event.action == MotionEvent.ACTION_UP) {
+                            view.performClick()
+                        }
+                        true
+                    }
                 } catch (e: Exception) {
                     Log.e("ScannerScreen", "Use case binding failed", e)
                 }
