@@ -8,5 +8,8 @@ android {
 
 dependencies {
     implementation(project(":core:designsystem"))
+    implementation(project(":core:vision"))
     implementation(project(":domain"))
+
+    implementation(libs.bundles.compose.core)
 }
