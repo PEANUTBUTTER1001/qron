@@ -1,9 +1,9 @@
-package com.peanutbutter1001.qron.feature.history
+package com.peanutbutter1001.qron.feature.history.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.peanutbutter1001.qron.domain.model.QRResult
-import com.peanutbutter1001.qron.domain.model.QRType
+import com.peanutbutter1001.qron.domain.model.ScanSource
 import com.peanutbutter1001.qron.domain.repository.HistoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,16 +14,19 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-/** 기록 목록 필터. 라벨과 매칭 규칙을 함께 가진다. */
-enum class HistoryFilter(val label: String) {
-    ALL("전체"),
-    LINK("링크"),
-    PAYMENT("결제/쿠폰");
+/**
+ * 기록 목록 필터.
+ * 표시 문자열은 UI 계층에서 stringResource로 매핑한다(하드코딩 배제).
+ */
+enum class HistoryFilter {
+    ALL,
+    SCAN,
+    CAMERA;
 
     fun matches(result: QRResult): Boolean = when (this) {
         ALL -> true
-        LINK -> result.type == QRType.URL
-        PAYMENT -> result.type == QRType.PAYMENT
+        SCAN -> result.source == ScanSource.SCREEN
+        CAMERA -> result.source == ScanSource.EXTERNAL
     }
 }
 

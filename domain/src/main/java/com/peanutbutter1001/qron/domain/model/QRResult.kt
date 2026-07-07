@@ -16,5 +16,5 @@ data class QRResult(
     val title: String,
     val type: QRType,
     val source: ScanSource,
-    val scannedAt: LocalDateTime = LocalDateTime.now()
+    val scannedAt: LocalDateTime = LocalDateTime.now().withNano(0)
 )

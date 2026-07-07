@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -21,7 +22,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.peanutbutter1001.qron.feature.history.HistoryRoute
+import com.peanutbutter1001.qron.R
+import com.peanutbutter1001.qron.feature.history.ui.HistoryRoute
 import com.peanutbutter1001.qron.feature.result.ResultRoute
 import com.peanutbutter1001.qron.feature.scanner.ScannerRoute
 
@@ -48,14 +50,24 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                     NavigationBarItem(
                         selected = currentDestination?.hasRoute(Scanner::class) == true,
                         onClick = { navController.navigateToTopLevel(Scanner) },
-                        icon = { Icons.Default.QrCode },
-                        label = { Text("스캐너") }
+                        icon = {
+                            Icon(
+                                Icons.Default.QrCode,
+                                stringResource(R.string.nav_scanner)
+                            )
+                        },
+                        label = { stringResource(R.string.nav_scanner) }
                     )
                     NavigationBarItem(
                         selected = currentDestination?.hasRoute(History::class) == true,
                         onClick = { navController.navigateToTopLevel(History) },
-                        icon = { Icons.Default.History },
-                        label = { Text("기록") }
+                        icon = {
+                            Icon(
+                                Icons.Default.History,
+                                stringResource(R.string.nav_history)
+                            )
+                        },
+                        label = { stringResource(R.string.nav_history) }
                     )
                 }
             }
