@@ -11,8 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.materialIcon
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -26,6 +30,20 @@ import com.peanutbutter1001.qron.domain.model.QRResult
 import com.peanutbutter1001.qron.domain.model.QRType
 import com.peanutbutter1001.qron.domain.model.ScanSource
 import java.time.LocalDateTime
+import androidx.compose.runtime.getValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
+/** 기록 화면의 stateful 계층. ViewModel 상태를 수집해 stateless Screen에 전달한다. */
+@Composable
+fun HistoryRoute(viewModel: HistoryViewModel = hiltViewModel()) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    HistoryScreen(
+        uiState = uiState,
+        onFilterSelected = viewModel::onFilterSelected,
+        onClearHistory = viewModel::clearHistory
+    )
+}
 
 /**
  * 기록 화면의 stateless 계층. 상태(uiState)와 이벤트 콜백만 받는다.
@@ -55,7 +73,10 @@ fun HistoryScreen(
             )
             Spacer(modifier = Modifier.width(8.dp))
             IconButton(onClick = onClearHistory) {
-                Text("🗑️")
+                Icon(
+                    Icons.Default.Delete,
+                    "ClearHistory"
+                )
             }
         }
 

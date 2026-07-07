@@ -27,6 +27,10 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name="com.peanutbutter1001.qron.feature.scan.QRonTileService"
+            android:icon="@drawable/ic_qs_qron" />
+
     </application>
 
 </manifest>
