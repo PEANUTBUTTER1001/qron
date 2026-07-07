@@ -10,7 +10,7 @@ class QRonTileService : TileService() {
 
     override fun onStartListening() {
         super.onStartListening()
-        qsTile?.state = android.service.quicksettings.Tile.STATE_ACTIVE
+        qsTile?.state = android.service.quicksettings.Tile.STATE_INACTIVE
         qsTile?.updateTile()
     }
 

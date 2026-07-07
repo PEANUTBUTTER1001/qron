@@ -9,4 +9,6 @@ android {
 dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":domain"))
+
+    implementation(libs.bundles.compose.core)
 }

@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <group
+        android:scaleX="0.24359"
+        android:scaleY="0.24359"
+        android:translateX="1.03846"
+        android:translateY="1.03846">
+        <path
+            android:pathData="M78,58 L78,30 A18,18 0 0 0 60,12 L30,12 A18,18 0 0 0 12,30 L12,60 A18,18 0 0 0 30,78 L58,78"
+            android:fillColor="#00000000"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="12"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"/>
+        <path android:fillColor="#FFFFFFFF" android:pathData="M27.5,23 h10.0 a4.5,4.5 0 0 1 4.5,4.5 v10.0 a4.5,4.5 0 0 1 -4.5,4.5 h-10.0 a4.5,4.5 0 0 1 -4.5,-4.5 v-10.0 a4.5,4.5 0 0 1 4.5,-4.5 z"/>
+        <path android:fillColor="#FFFFFFFF" android:pathData="M52.5,23 h10.0 a4.5,4.5 0 0 1 4.5,4.5 v10.0 a4.5,4.5 0 0 1 -4.5,4.5 h-10.0 a4.5,4.5 0 0 1 -4.5,-4.5 v-10.0 a4.5,4.5 0 0 1 4.5,-4.5 z"/>
+        <path android:fillColor="#FFFFFFFF" android:pathData="M27.5,48 h10.0 a4.5,4.5 0 0 1 4.5,4.5 v10.0 a4.5,4.5 0 0 1 -4.5,4.5 h-10.0 a4.5,4.5 0 0 1 -4.5,-4.5 v-10.0 a4.5,4.5 0 0 1 4.5,-4.5 z"/>
+        <path android:fillColor="#FFFFFFFF" android:pathData="M49.5,48 h4.0 a1.5,1.5 0 0 1 1.5,1.5 v4.0 a1.5,1.5 0 0 1 -1.5,1.5 h-4.0 a1.5,1.5 0 0 1 -1.5,-1.5 v-4.0 a1.5,1.5 0 0 1 1.5,-1.5 z"/>
+        <path android:fillColor="#FFFFFFFF" android:pathData="M61.5,48 h4.0 a1.5,1.5 0 0 1 1.5,1.5 v4.0 a1.5,1.5 0 0 1 -1.5,1.5 h-4.0 a1.5,1.5 0 0 1 -1.5,-1.5 v-4.0 a1.5,1.5 0 0 1 1.5,-1.5 z"/>
+        <path android:fillColor="#FFFFFFFF" android:pathData="M49.5,60 h4.0 a1.5,1.5 0 0 1 1.5,1.5 v4.0 a1.5,1.5 0 0 1 -1.5,1.5 h-4.0 a1.5,1.5 0 0 1 -1.5,-1.5 v-4.0 a1.5,1.5 0 0 1 1.5,-1.5 z"/>
+        <path android:fillColor="#FFFFFFFF" android:pathData="M56.0,55 h3.0 a1.0,1.0 0 0 1 1.0,1.0 v3.0 a1.0,1.0 0 0 1 -1.0,1.0 h-3.0 a1.0,1.0 0 0 1 -1.0,-1.0 v-3.0 a1.0,1.0 0 0 1 1.0,-1.0 z"/>
+        <group android:rotation="-45" android:pivotX="73" android:pivotY="73">
+            <path android:fillColor="#FFFFFFFF" android:pathData="M73,61 h0 a6,6 0 0 1 6,6 v12 a6,6 0 0 1 -6,6 h0 a6,6 0 0 1 -6,-6 v-12 a6,6 0 0 1 6,-6 z"/>
+        </group>
+    </group>
+</vector>

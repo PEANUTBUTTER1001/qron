@@ -2,6 +2,10 @@ package com.peanutbutter1001.qron.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -44,13 +48,13 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
                     NavigationBarItem(
                         selected = currentDestination?.hasRoute(Scanner::class) == true,
                         onClick = { navController.navigateToTopLevel(Scanner) },
-                        icon = { Text("📷") },
+                        icon = { Icons.Default.QrCode },
                         label = { Text("스캐너") }
                     )
                     NavigationBarItem(
                         selected = currentDestination?.hasRoute(History::class) == true,
                         onClick = { navController.navigateToTopLevel(History) },
-                        icon = { Text("🕒") },
+                        icon = { Icons.Default.History },
                         label = { Text("기록") }
                     )
                 }
