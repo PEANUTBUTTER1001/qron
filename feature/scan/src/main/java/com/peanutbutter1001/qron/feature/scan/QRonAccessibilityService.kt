@@ -1,6 +1,7 @@
 package com.peanutbutter1001.qron.feature.scan
 
 import android.accessibilityservice.AccessibilityService
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -25,6 +26,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@SuppressLint("AccessibilityPolicy")
 @AndroidEntryPoint
 class QRonAccessibilityService : AccessibilityService() {
 
@@ -73,6 +75,17 @@ class QRonAccessibilityService : AccessibilityService() {
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
     override fun onInterrupt() {}
 
+    /** 실패 안내 토스트를 메인 스레드에서 LENGTH_LONG 으로 띄운다. */
+    private fun showToast(message: String) {
+        serviceScope.launch {
+            android.widget.Toast.makeText(
+                this@QRonAccessibilityService,
+                message,
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.R)
     private fun performScreenshot() {
         serviceScope.launch {
@@ -103,9 +116,12 @@ class QRonAccessibilityService : AccessibilityService() {
                                     val softwareBitmap = hwBitmap.copy(Bitmap.Config.ARGB_8888, false)
                                     hwBitmap.recycle()
                                     processBitmap(softwareBitmap)
+                                } else {
+                                    showToast("화면 캡처 처리에 실패했습니다.")
                                 }
                             } catch (e: Exception) {
                                 Log.e(TAG, "스크린샷 처리 실패", e)
+                                showToast("화면 캡처 처리에 실패했습니다.")
                             }
                         }
 
@@ -123,6 +139,7 @@ class QRonAccessibilityService : AccessibilityService() {
                 )
             } catch (e: Exception) {
                 Log.e(TAG, "performScreenshot 실패", e)
+                showToast("화면을 스캔하지 못했습니다.")
             }
         }
     }
@@ -143,14 +160,12 @@ class QRonAccessibilityService : AccessibilityService() {
                     val fillInIntent = Intent().apply { putExtra("QR_RESULT_ID", id) }
                     currentPendingIntent?.send(this@QRonAccessibilityService, 0, fillInIntent)
                 } else {
-                    android.widget.Toast.makeText(
-                        this@QRonAccessibilityService,
-                        "화면에서 QR 코드를 찾을 수 없습니다.",
-                        android.widget.Toast.LENGTH_SHORT
-                    ).show()
+                    // 화면에서 QR 미검출: 실패 안내
+                    showToast("화면에서 QR 코드를 찾을 수 없습니다.")
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "processBitmap 실패", e)
+                showToast("스캔 처리 중 오류가 발생했습니다.")
             } finally {
                 // 기존 누락 버그 수정: 예외 여부와 무관하게 원본 스크린샷 Bitmap 항상 해제
                 bitmap.recycle()
