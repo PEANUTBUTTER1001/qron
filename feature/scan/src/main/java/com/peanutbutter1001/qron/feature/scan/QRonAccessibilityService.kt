@@ -59,6 +59,7 @@ class QRonAccessibilityService : AccessibilityService() {
         }
     }
 
+    @SuppressLint("WrongConstant")
     override fun onServiceConnected() {
         super.onServiceConnected()
         val filter = IntentFilter(QRonTileService.ACTION_REQUEST_SCREENSHOT)
