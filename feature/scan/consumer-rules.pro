@@ -1,3 +1,0 @@
--keep,allowoptimization,allowobfuscation class * {
-    *;
-}

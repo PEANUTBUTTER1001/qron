@@ -3,6 +3,8 @@ plugins {
     id("my.android.compose")
     id("my.android.hilt")
     alias(libs.plugins.kotlin.serialization)
+//    alias(libs.plugins.google.services)
+//    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -47,4 +49,9 @@ dependencies {
 
     // ML Kit (for InputImage)
     implementation(libs.mlkit.barcode.scanning)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
 }
